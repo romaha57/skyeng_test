@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% block title %} {{ block.super }} {% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-4 py-5">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="small mb-1" for="{{ form.file.id_for_label }}">Файл</label>
+                    {{ form.file }}
+                </div>
+                <br>
+                <button class="btn btn-primary" type="submit">Загрузить</button>
+            </form>
+        </div>
+        <div class="col-lg-8 py-5">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Название файла</th>
+                    <th scope="col">Статус</th>
+                    <th scope="col">Время изменения</th>
+                    <th scope="col">Статус проверки</th>
+                    <th scope="col">Результат</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for file in request.user.files.all %}
+                {% if file.status != 'deleted' %}
+                <tr>
+                    <td>{{ file.filename }}</td>
+                    <td>{{ file.get_status_display }}</td>
+                    <td>{{ file.updated_at| naturaltime }}</td>
+                    {% if file.is_check %}
+                    <td>Результат отправлен вам на почту - {{ request.user.email }}</td>
+                    {% else %}
+                    <td>Не проверено</td>
+                    {% endif %}
+
+                    {% if file.is_right %}
+                    <td>Выполнено<i class="bi bi-check-circle" style="font-size: 40px;"></i></td>
+                    {% else %}
+                    <td>Переделать<i class="bi bi-arrow-repeat" style="font-size: 40px;"></i></td>
+                    {% endif %}
+                    <td><a class="btn btn-warning" href="{% url 'main:delete_file' file.id %}">Удалить</a></td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
