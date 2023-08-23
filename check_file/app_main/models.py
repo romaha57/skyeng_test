@@ -1,5 +1,3 @@
-import os
-
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -18,6 +16,8 @@ STATUSES_UPLOAD_FILE = (
 
 
 class UploadFile(models.Model):
+    """Модель загруженного файла"""
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='files', verbose_name='пользователь')
     file = models.FileField(upload_to=path_for_upload_file, verbose_name='файл')
     status = models.CharField(max_length=20, choices=STATUSES_UPLOAD_FILE, verbose_name='статус', default='new')
@@ -27,6 +27,8 @@ class UploadFile(models.Model):
     is_right = models.BooleanField(verbose_name='правильно выполнено', null=True, blank=True)
 
     def filename(self):
+        """Название файла"""
+
         return self.file.name.split('/')[-1]
 
     class Meta:
@@ -37,3 +39,15 @@ class UploadFile(models.Model):
     def __str__(self):
         return f'{self.user.email}/{self.file}'
 
+    def update_after_check(self, message_text: str):
+        """Изменения полей файла в БД после проверки его """
+
+        # отмечаем правильность выполнения файла
+        if 'успешно' in message_text:
+            self.is_right = True
+        else:
+            self.is_right = False
+
+        # отмечаем что файл проверен
+        self.is_check = True
+        self.save()

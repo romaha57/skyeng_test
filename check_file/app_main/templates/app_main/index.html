@@ -3,5 +3,21 @@
 {% block title %} {% endblock %}
 
 {% block content %}
-    <h2>Главная</h2>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 py-5">
+            <h2>Сервис проверки файлов</h2>
+
+            {% if not request.user.is_authenticated %}
+                <p>Доступно после авторизации:
+                    <a href="{% url 'users:sign-in' %}">Войти</a>
+                </p>
+            {% endif %}
+            <p>Во вкладке 'Загрузить файл' можно добавить файл с расширением .py</p>
+            <p>Затем этот файл отправится на автоматическую проверку линтером pycodestyle и результаты работы отправятся
+                вам на почту, указанную при регистрации</p>
+            <p>Отчеты о проверке файлов вы можете просмотреть в таблицу во вкладе 'Загрузить файл'</p>
+        </div>
+    </div>
+</div>
 {% endblock %}

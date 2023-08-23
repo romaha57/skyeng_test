@@ -26,7 +26,8 @@ class UserRegistrationView(TitleMixin, CreateView):
     title = 'Регистрация'
 
     def form_valid(self, form):
+        """Добавляем email в поле формы username"""
+
         form.instance.username = form.cleaned_data.get('email')
 
         return super().form_valid(form)
-

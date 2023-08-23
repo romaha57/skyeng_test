@@ -2,7 +2,7 @@ import subprocess
 
 
 def check_linter_file(file_path: str) -> str:
-    """Провеярем файл на ошибки и формируем сообщение"""
+    """Проверяем файл на ошибки линтеров и формируем сообщение"""
 
     run_pycodestyle = subprocess.run(['python3', '-m', 'pycodestyle', f'media/{file_path}'],
                                      stdout=subprocess.PIPE,

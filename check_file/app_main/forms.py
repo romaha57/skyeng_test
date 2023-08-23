@@ -7,6 +7,8 @@ from .models import UploadFile
 
 
 class UploadFileForm(forms.ModelForm):
+    """Форма загрузки файла"""
+
     class Meta:
         model = UploadFile
         fields = ('file', )
@@ -22,8 +24,12 @@ class UploadFileForm(forms.ModelForm):
         return filename
 
     def save(self, commit=True):
-        print(self.instance.status)
-        if self.instance.status == 'new' and os.path.exists(f'media/{self.instance}') and str(self.instance).split('/')[-1] == str(self.cleaned_data.get('file')):
+        """Если файл с таким названием уже есть, то удаляем его и добавляем новый"""
+
+        if (self.instance.status == 'new') and \
+                (os.path.exists(f'media/{self.instance}')) and \
+                (str(self.instance).split('/')[-1] == str(self.cleaned_data.get('file'))):
+
             os.remove(f'media/{self.instance}')
             self.instance.status = 'overwritten'
 

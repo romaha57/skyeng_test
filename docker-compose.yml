@@ -1,0 +1,100 @@
+version: '2'
+
+services:
+    nginx:
+        restart: always
+        image: nginx:1.23-alpine
+        ports:
+            - 80:80
+        volumes:
+            - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+            - static_volume:/app/backend/django_static
+        depends_on:
+            -   db
+    server:
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: ./docker/backend/Dockerfile
+        entrypoint: /app/docker/backend/server-entrypoint.sh
+        volumes:
+            - static_volume:/app/backend/django_static
+        expose:
+            - 8000
+        environment:
+            DEBUG: "True"
+            CELERY_BROKER_URL: "redis://redis:6379/0"
+            CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+            POSTGRES_HOST: db
+            POSTGRES_NAME: skyeng
+            POSTGRES_USER: skyeng_user
+            POSTGRES_PASSWORD: skyeng_user
+            POSTGRES_PORT: 5432
+            DJANGO_SUPERUSER_PASSWORD: admin
+            DJANGO_SUPERUSER_EMAIL: safin.rom@group-dvm.net
+            DJANGO_SUPERUSER_USERNAME: safin.rom@group-dvm.net
+        depends_on:
+            - db
+        links:
+            - db:db
+    worker:
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: ./docker/backend/Dockerfile
+        entrypoint: /app/docker/backend/worker-entrypoint.sh
+        volumes:
+            - static_volume:/app/backend/django_static
+        environment:
+            DEBUG: "True"
+            CELERY_BROKER_URL: "redis://redis:6379/0"
+            CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+            POSTGRES_HOST: db
+            POSTGRES_NAME: skyeng
+            POSTGRES_USER: skyeng_user
+            POSTGRES_PASSWORD: skyeng_user
+            POSTGRES_PORT: 5432
+        depends_on:
+            - server
+            - redis
+    beat:
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: ./docker/backend/Dockerfile
+        entrypoint: /app/docker/backend/beat-entrypoint.sh
+        volumes:
+            - static_volume:/app/backend/django_static
+        environment:
+            DEBUG: "True"
+            CELERY_BROKER_URL: "redis://redis:6379/0"
+            CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+            POSTGRES_HOST: db
+            POSTGRES_NAME: skyeng
+            POSTGRES_USER: skyeng_user
+            POSTGRES_PASSWORD: skyeng_user
+            POSTGRES_PORT: 5432
+        depends_on:
+            - server
+            - redis
+    redis:
+        restart: unless-stopped
+        image: redis:7.0.5-alpine
+        expose:
+            - 6379
+    db:
+        image: postgres:13.0-alpine
+        container_name: db
+        restart: always
+        volumes:
+            - postgres_data:/var/lib/postgresql/data/
+        environment:
+            POSTGRES_DB: skyeng
+            POSTGRES_USER: skyeng_user
+            POSTGRES_PASSWORD: skyeng_user
+        expose:
+            - 5432
+
+volumes:
+    static_volume: {}
+    postgres_data: {}

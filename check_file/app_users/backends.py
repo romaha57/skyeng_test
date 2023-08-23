@@ -5,7 +5,7 @@ from django.core.exceptions import MultipleObjectsReturned
 
 class UserModelBackend(ModelBackend):
     """
-    Переопределение авторизации
+    Переопределение авторизации для входа по email
     """
 
     def authenticate(self, request, username=None, password=None, **kwargs):

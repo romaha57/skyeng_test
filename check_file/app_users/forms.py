@@ -26,6 +26,7 @@ class LoginForm(AuthenticationForm):
         user = authenticate(self.request, username=email, password=password)
         if user:
             login(self.request, user)
+
             return redirect('main:index')
 
 

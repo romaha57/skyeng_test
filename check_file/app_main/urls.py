@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import IndexView, UploadFileView, DeleteFile
+from .views import DeleteFile, IndexView, UploadFileView
 
 app_name = 'main'
 
