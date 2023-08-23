@@ -31,8 +31,8 @@ services:
             POSTGRES_PASSWORD: skyeng_user
             POSTGRES_PORT: 5432
             DJANGO_SUPERUSER_PASSWORD: admin
-            DJANGO_SUPERUSER_EMAIL: safin.rom@group-dvm.net
-            DJANGO_SUPERUSER_USERNAME: safin.rom@group-dvm.net
+            DJANGO_SUPERUSER_EMAIL: test@yandex.ru
+            DJANGO_SUPERUSER_USERNAME: test@yandex.ru
         depends_on:
             - db
         links:
